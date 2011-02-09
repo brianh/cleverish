@@ -1,3 +1,0 @@
- (ns cleverish.utils)
-;;
-;; testing...
