@@ -15,3 +15,12 @@
     (is (= 3 (f 3 3)))
     (is (= {:x 1 :y -3} (f2 {:x 4 :y 8} {:x 1 :y -3})))
     (is (= {:x 4 :y 8} (f2 {:x 4 :y 8} {:x 9 :y -3})))))
+
+
+;;
+;; Non-code stuff for easy REPL loading...
+;;
+(comment 
+  (require 'clojure.test)
+  (clojure.test/run-tests 'cleverish.test-utils)
+  )
