@@ -11,13 +11,14 @@
     (fn []
       (+ min (rand-fn xspan)))))
 
-;; function that generates another function that determines which solution is better
-(defn test-gen [compare-fn cost-fn]
+(defn coster-gen [compare-fn cost-fn]
+  "Function that generates another function that determines
+   which solution is better using the provide comparison and
+   cost functions."
   (fn [s1 s2]
     (if (compare-fn (cost-fn s1) (cost-fn s2))
       s1
       s2)))
-
 
 ;;
 ;; Non-code stuff for easy REPL loading...

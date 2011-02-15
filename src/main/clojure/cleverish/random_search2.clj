@@ -7,16 +7,23 @@
 ;;;; see-> http://www.cleveralgorithms.com/nature-inspired/stochastic/random_search.html
 ;;;;
 
-(defn sum-squares [v]
-  (reduce + (map #(Math/pow % 2.0) v)))
+(defn sum-squares [s]
+  "Squares the elements of the provided sequence and then
+   sums them."
+  (reduce + (map #(Math/pow % 2.0) s)))
 
-(def r-gen (bounded-rand-gen rand -5 5))
-(def minimizer (test-gen < sum-squares))
-(def maximizer (test-gen > sum-squares))
-(def vec-soln-seq (repeatedly #(into [] (take 2 (repeatedly r-gen)))))
+(def minimizer (coster-gen < sum-squares))
+(def maximizer (coster-gen > sum-squares))
 
-(defn solve [test-fn solutions]
-  (reduce test-fn solutions))
+(defn random-vec-generator [n rand-gen]
+  "Generates a random vector of length n utilizing
+   the provided random number generator."
+  (repeatedly #(into [] (take n (repeatedly rand-gen)))))
+  
+(def soln-seq (random-vec-generator 2 (bounded-rand-gen rand -5 5)))
+
+(defn solve [n]
+  (reduce minimizer (take n soln-seq)))
 
 
 ;;
