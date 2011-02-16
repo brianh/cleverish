@@ -20,6 +20,14 @@
       s1
       s2)))
 
+(defn sum-squares [s]
+  "Squares the elements of the provided sequence and then
+   sums them."
+  (reduce + (map #(Math/pow % 2.0) s)))
+
+(def minimizer (coster-gen < sum-squares))
+(def maximizer (coster-gen > sum-squares))
+
 ;;
 ;; Non-code stuff for easy REPL loading...
 ;;

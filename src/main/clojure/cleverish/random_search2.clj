@@ -7,14 +7,6 @@
 ;;;; see-> http://www.cleveralgorithms.com/nature-inspired/stochastic/random_search.html
 ;;;;
 
-(defn sum-squares [s]
-  "Squares the elements of the provided sequence and then
-   sums them."
-  (reduce + (map #(Math/pow % 2.0) s)))
-
-(def minimizer (coster-gen < sum-squares))
-(def maximizer (coster-gen > sum-squares))
-
 (defn random-vec-generator [n rand-gen]
   "Generates a random vector of length n utilizing
    the provided random number generator."
