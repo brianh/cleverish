@@ -7,9 +7,6 @@
 ;;;; see-> http://www.cleveralgorithms.com/nature-inspired/stochastic/random_search.html
 ;;;;
 
-(defprotocol Costable
-  (calc-cost [this] "Calculates the cost."))
-
 (defrecord Point2d [x y]
   Costable
   (calc-cost [this]

@@ -28,6 +28,9 @@
 (def minimizer (coster-gen < sum-squares))
 (def maximizer (coster-gen > sum-squares))
 
+(defprotocol Costable
+  (calc-cost [this] "Calculates the cost."))
+
 ;;
 ;; Non-code stuff for easy REPL loading...
 ;;
