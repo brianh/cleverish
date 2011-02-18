@@ -58,7 +58,7 @@
 		 (if (>= no-impr-cnt max-no-impr) (/ step-size s-factor) step-size) cur-soln))))))
 
 
-;   (recursive-search 1000 [[-5 5] [-5 5]] 0.05 small-factor large-factor iter-mult max-no-improvement))
+;   (recursive-search 1000 [[-5 5] [-5 5]] 0.05 small-factor large-factor iter-mult max-no-improvement)
 
 ;;
 ;; Non-code stuff for easy REPL loading...

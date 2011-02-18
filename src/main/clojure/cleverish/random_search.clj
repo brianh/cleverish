@@ -14,8 +14,7 @@
 		(Math/pow (:y this) 2.0))))
 
 (def r-gen (bounded-rand-gen rand -5 5))
-(def minimizer (coster-gen < calc-cost))
-(def maximizer (coster-gen > calc-cost))
+
 (def pt-soln-seq (map #(Point2d. %1 %2) (repeatedly r-gen) (repeatedly r-gen)))
 
 (defn solve [test-fn solutions]
