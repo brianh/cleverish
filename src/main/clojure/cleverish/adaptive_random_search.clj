@@ -15,7 +15,7 @@
   (+ min (* (- max min) (rand))))
 
 (defn rand-vec [soln-bounds]
-  (into [] (apply map #(rand-in-bounds %1 %2) soln-bounds)))
+  (into [] (map (fn [[min max]] (rand-in-bounds min max)) soln-bounds)))
 
 (defn make-soln [v]
   {:vec v :cost (sum-squares v)})
