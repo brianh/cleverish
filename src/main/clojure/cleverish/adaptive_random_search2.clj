@@ -27,8 +27,12 @@
   {:vec v :cost (sum-squares v)})
 
 (def the-soln (agent (make-soln (rand-vec))
-;		     :validator #(do (prn @the-soln) (<= (:cost %) (:cost @the-soln)))
+		     ; does not work maybe because self reference??
+;		     :validator #(do (prn @the-soln) (<= (:cost %) (:cost @the-soln))) 
 		     :error-mode :continue))
+
+;; capture the solutions as they occur
+(def soln-set (atom [@the-soln]))
 
 (defn take-step [size]
   (into [] (map #(let [[d-min d-max] %1
@@ -50,9 +54,7 @@
 	big-step (make-soln (take-step big-step-size))]
     (if (< (:cost big-step) (:cost new-step))
       (do
-	(prn new-step)
 	(send step-size (constantly big-step-size))
-	(prn big-step)
 	(send the-soln (constantly big-step)))
       (send the-soln (constantly new-step)))))
 
@@ -60,6 +62,8 @@
   (set-validator! the-soln #(<= (:cost %) (:cost @the-soln)))
   (add-watch the-soln :solve
 	     (fn [_ _ _ _] (send no-chg-cnt (constantly 0))))
+  (add-watch the-soln :solve
+	     (fn [_ _ _ new-soln] (swap! soln-set conj new-soln)))
   (add-watch iter :solve
 	     (fn [_ _ _ _] (take-steps)))
   (dotimes [n 1000]
