@@ -29,6 +29,28 @@
   (calc-cost [this]
 	     (reduce + (map dist (:p this) (rest (:p this))))))
 
+(def soln (atom (Path. (shuffle berlin52))))
+
+(defn stochastic-two-opt []
+  (let [soln-size (count @soln)
+	p1 (rand-int soln-size)
+	p2  (rand-int soln-size)]
+    
+    	[p1 (if (zero? p1) (dec soln-size))]))
+		
+  
+(defn local-search []
+  (loop [cnt 0]
+    (if (< cnt max-no-improvement)
+      (let [soln @soln
+	    soln-cost (calc-cost soln)
+	    new-soln (stochastic-two-opt)
+	    new-soln-cost (calc-cost new-soln)]
+	(if (< new-soln-cost soln-cost)
+	  (swap! soln (constantly new-soln)))
+	(recur (if (< new-soln-cost soln-cost) 0  (inc cnt)))))))
+
+	   
 ;;
 ;; Non-code stuff for easy REPL loading...
 ;;

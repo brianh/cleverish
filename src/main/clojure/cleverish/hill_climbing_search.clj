@@ -19,6 +19,7 @@
 	      (assoc this n new-bit)))
   (len [this]
        (count this))
+  
   java.lang.String
   (bit-or [this a]
 	  (apply str (map (fn [s1 s2]
