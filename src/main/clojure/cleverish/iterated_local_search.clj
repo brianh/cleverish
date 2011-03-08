@@ -27,28 +27,29 @@
 (defrecord Path [p]
   Costable
   (calc-cost [this]
-	     (reduce + (map dist (:p this) (rest (:p this))))))
+	     (+ (reduce + (map dist (:p this) (rest (:p this))))
+		(dist (first (:p this)) (last (:p this))))))
 
 (def soln (atom (Path. (shuffle berlin52))))
+(def soln-size (count @soln))
 
 (defn stochastic-two-opt []
-  (let [soln-size (count @soln)
-	p1 (rand-int soln-size)
+  (let [p1 (inc (rand-int (dec soln-size)))
 	p2  (rand-int soln-size)]
-    
-    	[p1 (if (zero? p1) (dec soln-size))]))
+    (flatten [(subvec v 0 3) (nth v 6) (subvec v 4 6) (nth v 3) (subvec v 7 9)])))
 		
   
 (defn local-search []
-  (loop [cnt 0]
-    (if (< cnt max-no-improvement)
+  (let [cnt (atom 0)]
+    (while (< cnt max-no-improvement)
       (let [soln @soln
 	    soln-cost (calc-cost soln)
 	    new-soln (stochastic-two-opt)
 	    new-soln-cost (calc-cost new-soln)]
 	(if (< new-soln-cost soln-cost)
-	  (swap! soln (constantly new-soln)))
-	(recur (if (< new-soln-cost soln-cost) 0  (inc cnt)))))))
+	  (do (swap! soln (constantly new-soln))
+	      (swap! cnt (constantly 0)))
+	  (swap! cnt inc))))))
 
 	   
 ;;
