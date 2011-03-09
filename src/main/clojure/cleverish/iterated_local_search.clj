@@ -31,20 +31,30 @@
 		(dist (first (:p this)) (last (:p this))))))
 
 (def soln (atom (Path. (shuffle berlin52))))
-(def soln-size (count @soln))
+(def soln-size (count (:p @soln)))
 
-(defn stochastic-two-opt []
-  (let [p1 (inc (rand-int (dec soln-size)))
-	p2  (rand-int soln-size)]
-    (flatten [(subvec v 0 3) (nth v 6) (subvec v 4 6) (nth v 3) (subvec v 7 9)])))
-		
+(defn unique-rand-ints [r]
+  "Constucts a vector of two unique random ints within
+   the provided range"
+  (let [r1 (rand-int r)]
+    [r1 (first (filter (partial not= r1)
+		       (repeatedly #(rand-int r))))]))
+
+(defn swap-two-rand [v]
+  "Swaps two random vector slots."
+  (let [[r1 r2] (unique-rands (count v))
+	val1 (nth v r1)
+	val2 (nth v r2)]
+    (-> v
+	(assoc r1 val2)
+	(assoc r2 val1))))		
   
 (defn local-search []
   (let [cnt (atom 0)]
     (while (< cnt max-no-improvement)
       (let [soln @soln
 	    soln-cost (calc-cost soln)
-	    new-soln (stochastic-two-opt)
+	    new-soln (swap-two-rand soln)
 	    new-soln-cost (calc-cost new-soln)]
 	(if (< new-soln-cost soln-cost)
 	  (do (swap! soln (constantly new-soln))
