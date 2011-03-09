@@ -40,9 +40,24 @@
     [r1 (first (filter (partial not= r1)
 		       (repeatedly #(rand-int r))))]))
 
+(defn unique-rand-int [r]
+  "Toy.  In reality, you're better off randomizing a vector of natural
+   numbers up to the size you want...
+
+  Constucts a function that will return a unique random int within
+   the provided range until the range is exhausted (at which time it
+   will start over with a new random value)."
+  (let [s (atom #{})]
+    (fn []
+      (if (>= (count @s) r)
+	(swap! s (constantly #{})))
+      (let [result (first (filter (complement @s) (repeatedly #(rand-int r))))]
+	(swap! s conj result)
+	result))))
+
 (defn swap-two-rand [v]
   "Swaps two random vector slots."
-  (let [[r1 r2] (unique-rands (count v))
+  (let [[r1 r2] (unique-rand-ints (count v))
 	val1 (nth v r1)
 	val2 (nth v r2)]
     (-> v
