@@ -1,9 +1,6 @@
 (ns cleverish.iterated-local-search
   (:use cleverish.utils))
 
-;;;;
-;;;; Another way... using agents
-;;;;
 (def berlin52 [[565,575],[25,185],[345,750],[945,685],[845,655],
 	       [880,660],[25,230],[525,1000],[580,1175],[650,1130],[1605,620],
 	       [1220,580],[1465,200],[1530,5],[845,680],[725,370],[145,665],
@@ -24,13 +21,13 @@
   (dist [this that]
 	(Math/sqrt (reduce + (map #(Math/pow (- %1 %2) 2) this that)))))
 
-(defrecord Path [p]
-  Costable
+(extend-protocol Costable
+  clojure.lang.IPersistentVector
   (calc-cost [this]
-	     (+ (reduce + (map dist (:p this) (rest (:p this))))
-		(dist (first (:p this)) (last (:p this))))))
+	     (+ (reduce + (map dist this (rest this)))
+		(dist (first this) (last this)))))
 
-(def soln (atom (Path. (shuffle berlin52))))
+(def soln (atom (shuffle berlin52)))
 (def soln-size (count (:p @soln)))
 
 (defn unique-rand-ints [r]
@@ -62,21 +59,38 @@
 	val2 (nth v r2)]
     (-> v
 	(assoc r1 val2)
-	(assoc r2 val1))))		
+	(assoc r2 val1))))
   
-(defn local-search []
-  (let [cnt (atom 0)]
+(defn local-search [v]
+  (let [cnt (atom 0)
+	local-soln (atom v)]
     (while (< cnt max-no-improvement)
-      (let [soln @soln
-	    soln-cost (calc-cost soln)
-	    new-soln (swap-two-rand soln)
+      (let [local-soln-cost (calc-cost local-soln)
+	    new-soln (swap-two-rand local-soln)
 	    new-soln-cost (calc-cost new-soln)]
-	(if (< new-soln-cost soln-cost)
-	  (do (swap! soln (constantly new-soln))
+	(if (< new-soln-cost local-soln-cost)
+	  (do (swap! local-soln (constantly new-soln))
 	      (swap! cnt (constantly 0)))
 	  (swap! cnt inc))))))
 
-	   
+(defn double-bridge-shuffle [v]
+  (let [span (/ soln-size 4)
+	pos1 (+ 1 (rand-int span))
+	pos2 (+ 1 pos1 (rand-int span))
+	pos3 (+ 1 pos2 (rand-int span))]
+    (-> (subvec v 0 pos1)
+	(into (subvec v pos3 soln-size))
+	(into (subvec v pos2 pos3))
+	(into (subvec v pos1 pos2)))))
+
+(defn search [iters]
+  (local-search)
+  (dotimes [n iters]
+    (let [temp (double-bridge-shuffle @soln)
+	  best-temp (local-search @soln)]
+      (if (< (calc-cost @soln) (calc-cost best-temp))
+	(swap! soln (constantly best-temp))))))
+
 ;;
 ;; Non-code stuff for easy REPL loading...
 ;;
