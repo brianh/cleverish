@@ -60,18 +60,26 @@
     (-> v
 	(assoc r1 val2)
 	(assoc r2 val1))))
+
+(defn reverse-rand-subvec [v]
+  "Swaps two random vector slots."
+  (let [[r1 r2] (sort (unique-rand-ints (count v)))]
+    (-> (subvec v 0 r1)
+	(into (reverse (subvec v r1 r2)))
+	(into (subvec v r2)))))
   
 (defn local-search [v]
   (let [cnt (atom 0)
 	local-soln (atom v)]
-    (while (< cnt max-no-improvement)
-      (let [local-soln-cost (calc-cost local-soln)
-	    new-soln (swap-two-rand local-soln)
+    (while (< @cnt max-no-improvement)
+      (let [local-soln-cost (calc-cost @local-soln)
+	    new-soln (reverse-rand-subvec @local-soln)
 	    new-soln-cost (calc-cost new-soln)]
 	(if (< new-soln-cost local-soln-cost)
 	  (do (swap! local-soln (constantly new-soln))
 	      (swap! cnt (constantly 0)))
-	  (swap! cnt inc))))))
+	  (swap! cnt inc))))
+    @local-soln))
 
 (defn double-bridge-shuffle [v]
   (let [span (/ soln-size 4)
@@ -79,16 +87,19 @@
 	pos2 (+ 1 pos1 (rand-int span))
 	pos3 (+ 1 pos2 (rand-int span))]
     (-> (subvec v 0 pos1)
-	(into (subvec v pos3 soln-size))
+	(into (subvec v pos3))
 	(into (subvec v pos2 pos3))
 	(into (subvec v pos1 pos2)))))
 
 (defn search [iters]
-  (local-search)
+  (swap! soln (constantly (local-search @soln)))
   (dotimes [n iters]
-    (let [temp (double-bridge-shuffle @soln)
-	  best-temp (local-search @soln)]
-      (if (< (calc-cost @soln) (calc-cost best-temp))
+    (let [cur-cost (calc-cost @soln)
+	  temp (double-bridge-shuffle @soln)
+	  best-temp (local-search @soln)
+	  best-temp-cost (calc-cost best-temp)]
+      ;(println "Current cost=" cur-cost ", newest cost =" best-temp-cost)
+      (if (< best-temp-cost cur-cost)
 	(swap! soln (constantly best-temp))))))
 
 ;;
